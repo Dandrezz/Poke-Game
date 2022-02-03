@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "postbuild": "purgecss --css dist/assets/*.css --content dist/index.html dist/assets/*.js --output dist/assets"
   },
   "dependencies": {
     "axios": "^0.21.1",

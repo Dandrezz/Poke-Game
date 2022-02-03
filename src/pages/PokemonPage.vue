@@ -14,8 +14,11 @@
       <button
         class="btn-success"
         @click="newGame">
-        Nuevo Juego
+        Siguiente
       </button>
+    </template>
+    <template v-else>
+      <h2 class="correcto" v-if="countRightAnswers!==0">{{ messageRightAnswers }}</h2>
     </template>
     
   </div>
@@ -25,7 +28,7 @@
 import PokemonPicture from "@/components/PokemonPicture.vue";
 import PokemonOptions from "@/components/PokemonOptions.vue";
 
-import getOptionsPokemons from '@/helpers/getOptionsPokemons';
+import { loadPokemons, getPokemonOptions } from '@/helpers/getOptionPokemons2';
 
 export default {
   components: { PokemonPicture, PokemonOptions },
@@ -35,13 +38,20 @@ export default {
       pokemon: null,
       showPokemon: false,
       showAnswer: false,
-      mesage: ''
+      mesage: '',
+      countRightAnswers: 0,
+      messageRightAnswers: ''
     }
   },
   methods: {
+    async loadPokemonsPage() {
+
+      await loadPokemons()
+      this.mixPokemonsArray()
+    },
     async mixPokemonsArray() {
 
-      this.pokemonArr = await getOptionsPokemons()
+      this.pokemonArr = await getPokemonOptions()
 
       const rndInt = Math.floor( Math.random() * 4 )
 
@@ -55,8 +65,12 @@ export default {
 
       if( selectedId === this.pokemon.id ){
         this.message = `Correcto, ${ this.pokemon.name }`
+        this.countRightAnswers += 1;
+        this.messageRightAnswers = `${ this.countRightAnswers } ${this.countRightAnswers===1 ? 'correcta' : 'correctas seguidas' }`
       } else {
         this.message = `Oops, era ${ this.pokemon.name }`
+        this.countRightAnswers = 0;
+        this.messageRightAnswers = ''
       }
       
     },
@@ -73,9 +87,17 @@ export default {
   },
   mounted() {
 
-    this.mixPokemonsArray()
+    this.loadPokemonsPage()
 
   }
 };
 
 </script>
+
+<style scoped>
+  .correcto{
+    color: #28a745;
+  }
+
+
+</style>
